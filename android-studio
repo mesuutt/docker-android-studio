@@ -14,11 +14,12 @@ docker run -ti --rm \
           --privileged \
           -e DISPLAY \
           -e GRADLE_USER_HOME='/workspace/.docker-dev/.gradle/home' \
+		  -v /dev/bus/usb:/dev/bus/usb \
           -v /tmp/.X11-unix:/tmp/.X11-unix \
           -v $CURRENT_DIR:/workspace \
           -v $CURRENT_DIR/.docker-dev/.studio-home:/home/developer/.AndroidStudio1.2 \
           -v $CURRENT_DIR/.docker-dev/.android/avd:/home/developer/.android/avd \
-          fgrehm/android-studio \
+          joseafonsopinto/android-studio \
           /bin/studio
 set +x
 xhost -

@@ -1,7 +1,7 @@
 .PHONY: build
 build:
-	docker build -t fschl/android-studio:151 .
-	docker tag fschl/android-studio:151 fschl/android-studio:latest
+	docker build -t joseafonsopinto/android-studio:143 .
+	docker tag joseafonsopinto/android-studio:143 joseafonsopinto/android-studio:latest
 
 .PHONY: hack
 hack: build

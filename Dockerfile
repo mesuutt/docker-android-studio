@@ -7,7 +7,7 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
 
 # Basic packages and Java 8
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
                       android-tools-adb \
                       android-tools-adbd \
                       blackbox \
@@ -28,14 +28,14 @@ RUN apt-get update \
                       software-properties-common \
                       unzip \
                       wget \
-    && add-apt-repository ppa:openjdk-r/ppa \
+    && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections \
+    && add-apt-repository -y ppa:webupd8team/java \
     && apt-get update \
-    && apt-get install -y \
-                      openjdk-8-jdk \
-                      ca-certificates-java \
+    && apt-get install -y oracle-java8-installer \
     && apt-get clean \
     && apt-get autoremove \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/oracle-jdk8-installer
 
 # Set things up using the dev user and reduce the need for `chown`s
 USER developer
@@ -50,14 +50,13 @@ RUN wget -q http://dl.google.com/android/android-sdk_r${SDK_VERSION}-linux.tgz -
     && rm /tmp/android-sdk.tar.gz
 
 # Configure the SDK
-# TODO: Move this up so that it is cached between android-studio releases
 ENV ANDROID_HOME="/home/developer/android-sdk-linux" \
     PATH="${PATH}:/home/developer/android-sdk-linux/tools:/home/developer/android-sdk-linux/platform-tools" \
-    JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+    JAVA_HOME="/usr/lib/jvm/java-8-oracle"
 
 # Android Studio
-ENV STUDIO_URL https://dl.google.com/dl/android/studio/ide-zips/1.5.1.0/android-studio-ide-141.2456560-linux.zip
-ENV STUDIO_SHA1 b8460a2197abe26979d88e3b01b3c8bfd80a37db
+ENV STUDIO_URL https://dl.google.com/dl/android/studio/ide-zips/2.1.3.0/android-studio-ide-143.3101438-linux.zip
+ENV STUDIO_SHA1 8729e6f2f1fa58f04df9f8d1caac2f5be9dfc549
 RUN cd /opt \
     && sudo mkdir android-studio \
     && sudo chown developer:developer android-studio \
@@ -65,27 +64,10 @@ RUN cd /opt \
     && echo "$STUDIO_SHA1 /tmp/android-studio.zip" | sha1sum -c - \
     && unzip /tmp/android-studio.zip \
     && rm /tmp/android-studio.zip
-
-
-# TODO: what else do we need for sdk stuff to work?
 RUN echo y | android update sdk --all --no-ui --force --filter platform-tools
 RUN echo y | android update sdk --all --no-ui --force --filter extra-android-m2repository
 RUN echo y | android update sdk --all --no-ui --force --filter extra-google-m2repository
-
-RUN echo y | android update sdk --all --no-ui --force --filter android-16
-RUN echo y | android update sdk --all --no-ui --force --filter source-16
-RUN echo y | android update sdk --all --no-ui --force --filter build-tools-16.0.0
-
-RUN echo y | android update sdk --all --no-ui --force --filter android-17
-RUN echo y | android update sdk --all --no-ui --force --filter source-17
-RUN echo y | android update sdk --all --no-ui --force --filter build-tools-17.0.4
-
-RUN echo y | android update sdk --all --no-ui --force --filter android-19
-RUN echo y | android update sdk --all --no-ui --force --filter source-19
-RUN echo y | android update sdk --all --no-ui --force --filter build-tools-19.0.3
-
 RUN echo y | android update sdk --all --no-ui --force --filter android-23
-RUN echo y | android update sdk --all --no-ui --force --filter source-23
 RUN echo y | android update sdk --all --no-ui --force --filter build-tools-23.0.3
 
 # http://stackoverflow.com/questions/32090832/android-studio-cant-start-after-installation
