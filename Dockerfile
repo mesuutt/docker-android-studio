@@ -28,6 +28,8 @@ RUN apt-get update \
                       software-properties-common \
                       unzip \
                       wget \
+                      libxtst6 \
+                      libxi6 \
     && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections \
     && add-apt-repository -y ppa:webupd8team/java \
     && apt-get update \
@@ -55,8 +57,9 @@ ENV ANDROID_HOME="/home/developer/android-sdk-linux" \
     JAVA_HOME="/usr/lib/jvm/java-8-oracle"
 
 # Android Studio
-ENV STUDIO_URL https://dl.google.com/dl/android/studio/ide-zips/2.1.3.0/android-studio-ide-143.3101438-linux.zip
-ENV STUDIO_SHA1 8729e6f2f1fa58f04df9f8d1caac2f5be9dfc549
+ENV STUDIO_URL https://dl.google.com/dl/android/studio/ide-zips/2.2.0.12/android-studio-ide-145.3276617-linux.zip
+ENV STUDIO_SHA1 4eec979ad4d216fd591ebe0112367c746cedb114
+
 RUN cd /opt \
     && sudo mkdir android-studio \
     && sudo chown developer:developer android-studio \
